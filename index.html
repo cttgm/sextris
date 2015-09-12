@@ -49,10 +49,20 @@
       rows <span id="rows">0</span></p>
       <p><br><br><br><br><canvas id="upcoming"></canvas></p>
       <p><input type="checkbox" name="pause" value="pause" id="pause">pause<br></p>
-      <p><br>play background music<br><audio controls loop>
+      <p><br><input type="checkbox" name="music" value="music" id="music" checked>play background music<br>
+      <audio id="background-music" loop>
       <source src="sound/tetris.ogg" type="audio/ogg">
       <source src="sound/tetris.mp3" type="audio/mpeg">
-      </audio></p>
+      </audio>
+      <audio id="level-clear" >
+      <source src="sound/level-clear.ogg" type="audio/ogg">
+      <source src="sound/level-clear.mp3" type="audio/mpeg">
+      </audio> 
+      <audio id="game-over" >
+      <source src="sound/game-over.ogg" type="audio/ogg">
+      <source src="sound/game-over.mp3" type="audio/mpeg">
+      </audio>            
+      </p>
     </div>
     <canvas id="canvas">
       Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
@@ -115,7 +125,7 @@
     // game constants
     //-------------------------------------------------------------------------
 
-    var KEY     = { ESC: 27, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40, P: 80 },
+    var KEY     = { ESC: 27, SPACE: 32, LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40, P: 80, M: 77 },
         DIR     = { UP: 0, RIGHT: 1, DOWN: 2, LEFT: 3, MIN: 0, MAX: 3 },
         stats   = new Stats(),
         canvas  = get('canvas'),
@@ -144,6 +154,7 @@
         rows,          // number of completed rows in the current game
         step;          // how long before current piece drops by 1 row
         oldPicture = -1;// holds the current photo displayed 
+        levelClear = 10;
 
     //-------------------------------------------------------------------------
     // tetris pieces
@@ -275,6 +286,7 @@ try{
           case KEY.DOWN:   actions.push(DIR.DOWN);  handled = true; break;
           case KEY.ESC:    lose();                  handled = true; break;
           case KEY.P:      document.getElementById('pause').checked ? document.getElementById('pause').checked=false : document.getElementById('pause').checked=true;  handled = true; break;
+          case KEY.M:      document.getElementById('music').checked ? document.getElementById('music').checked=false : document.getElementById('music').checked=true;  handled = true; break;
         }
       }
       else if (ev.keyCode == KEY.SPACE) {
@@ -289,8 +301,25 @@ try{
     // GAME LOGIC
     //-------------------------------------------------------------------------
 
-    function play() { hide('start'); reset();          playing = true;  }
-    function lose() { show('start'); setVisualScore(); playing = false; }
+    function play() 
+    {
+       if (document.getElementById('music').checked) 
+       { 
+          document.getElementById('background-music').play();
+       } 
+       hide('start'); reset();          playing = true;  
+    }
+    
+    function lose() 
+    { 
+       document.getElementById('background-music').pause(); 
+       if (document.getElementById('music').checked) 
+       { 
+          document.getElementById('game-over').play(); 
+       }  
+       show('start'); setVisualScore();
+       playing = false; 
+    }
 
     function setVisualScore(n)      { vscore = n || score; invalidateScore(); }
     function setScore(n)            { score = n; setVisualScore(n);  }
@@ -306,7 +335,15 @@ try{
     function setCurrentPiece(piece) { current = piece || randomPiece(); invalidate();     }
     function setNextPiece(piece)    { next    = piece || randomPiece(); invalidateNext(); }
     
-    function showPicture(rows) {       
+    function showPicture(rows) { 
+       if (rows >= levelClear)
+       {
+          if (document.getElementById('music').checked) 
+          { 
+             document.getElementById('level-clear').play();
+          }   
+          levelClear = levelClear + 10;
+       }
        if(rows > 200)
        {
           var picture = 7;
@@ -362,9 +399,21 @@ try{
     }
 
     function update(idt) {
-      if(!document.getElementById('pause').checked)
+      if(document.getElementById('pause').checked)
+      {
+         document.getElementById('background-music').pause();
+      }
+      else
       {
          if (playing) {
+            if (document.getElementById('music').checked) 
+            { 
+               document.getElementById('background-music').play();
+            }
+            else
+            { 
+               document.getElementById('background-music').pause();
+            }            
            if (vscore < score)
              setVisualScore(vscore + 1);
            handle(actions.shift());
