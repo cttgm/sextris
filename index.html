@@ -35,6 +35,14 @@
     border-radius: 50% / 10%;
     color: white;
    }
+   
+   .touchcontrol
+   {
+      padding:0;
+      margin:0;
+      width: 50px;
+      height: 50px;
+   }
 
   </style>
 </head>
@@ -45,11 +53,14 @@
     <div id="menu">
       <p id="start"><a href="javascript:play();">*** Click here to Play ***</a></p>
       <p><h1 class="h1">Sextris - Sexy Tetris</h1></p>
-      <p>score <span id="score">00000</span><br>
-      rows <span id="rows">0</span></p>
-      <p><br><br><br><br><canvas id="upcoming"></canvas></p>
-      <p><input type="checkbox" name="pause" value="pause" id="pause">pause<br></p>
-      <p><br><input type="checkbox" name="music" value="music" id="music" checked>play background music<br>
+      <p>rows <span id="rows">0</span> | score <span id="score">00000</span></p>
+      <p><br><br><canvas id="upcoming"></canvas></p>
+      <p><input type="checkbox" name="pause" value="pause" id="pause">pause</p>
+      <p><input type="checkbox" name="music" value="music" id="music" checked>play background music<br><br>
+      <br>
+      <button class="touchcontrol" type="button" onclick="actions.push(DIR.UP);">&#9650;</button><br>
+      <button class="touchcontrol" type="button" onclick="actions.push(DIR.LEFT);">&#9668;</button><button class="touchcontrol" type="button" onclick="actions.push(DIR.DOWN);">&#9660;</button><button class="touchcontrol" type="button" onclick="actions.push(DIR.RIGHT);">&#9658;</button>
+      </p>
       <audio id="background-music" loop>
       <source src="sound/tetris.ogg" type="audio/ogg">
       <source src="sound/tetris.mp3" type="audio/mpeg">
